@@ -74,10 +74,13 @@ data.dates.forEach( function( d, i )  {
 
   var line = d3.line();
 
+  var rectHover;
+
   groupY.selectAll('.date')
     .data( data.dates )
     .enter()
     .append('g')
+    .attr('id', function( d, i ) { return 'rect' + i })
     .attr('transform', function( d, i ) {
       return 'translate(' + scaleX.step() * i + ',0)';
     })
@@ -89,28 +92,42 @@ data.dates.forEach( function( d, i )  {
     .attr('height', settings.height - settings.top - settings.bottom );
 
 
-  groupY.selectAll('.plot-line')
+  groupY.selectAll('.plot-path')
     .data( points )
     .enter()
     .append('g')
-    .attr('id', function( d, i) { return 'line' + i })
-    .classed('plot-line', true )
-    .style('fill', function( d, i ){ return settings.colors[i] })
+    .classed('plot-path', true )
     .append('path')
     .style('fill', 'transparent')
     .style('stroke', function( d, i ){ return settings.colors[i] })
     .attr('d', function( d ) { return line( d ) });
 
 
+  groupY.selectAll('.plot-line')
+    .data( points )
+    .enter()
+    .append('g')
+    .attr('id', function( d, i) { return 'line' + i })
+    .style('fill', function( d, i ){ return settings.colors[i] })
+    .classed('plot-line', true );
 
   groupY.selectAll('.plot-line').selectAll('circle')
+    .data( function( d ) { return d } )
+    .enter()
+    .append('circle')
+    .attr('cx', function ( d ) { return d[0]})
+    .attr('cy', function ( d ) { return d[1]})
+    .attr('r', 4 );
+
+  groupY.selectAll('.plot-line').selectAll('.circle-area')
     .data( function( d ) { return d } )
     .enter()
     .append('circle')
     .attr('id', function( d, i) { return 'circle' + i })
     .attr('cx', function ( d ) { return d[0]})
     .attr('cy', function ( d ) { return d[1]})
-    .attr('r', 4 )
+    .attr('r', 8 )
+    .style('fill', 'transparent')
     .on('mouseenter', function() {
       var hintId = '#hint' + d3.event.target.parentNode.id.slice( 4 ) + '-' + d3.event.target.id.slice( 6 );
       d3.select( hintId )
@@ -124,6 +141,22 @@ data.dates.forEach( function( d, i )  {
         .transition( 750 )
         .style('opacity', 0)
         .style('display','none');
+    })
+
+
+  groupY.on('mousemove', function() {
+    var coords = d3.mouse( groupY._groups[0][0] );
+    var rectId = 'rect' + Math.floor( coords[0] / scaleX.step() );
+    if( rectHover !== rectId ) {
+      d3.select( '#' + rectHover).style('opacity', 0);
+      rectHover = rectId;
+      d3.select( '#' + rectHover).style('opacity', 1);
+    }
+  })
+    .on('mouseleave', function() {
+      if ( rectHover )
+        d3.select( '#' + rectHover).style('opacity', 0);
+      rectHover = false;
     });
 
   data.lines.forEach( function( line, i ) {

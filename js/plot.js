@@ -51,8 +51,9 @@ data.dates.forEach( function( d, i )  {
 
 
   var scaleY = d3.scaleLinear()
-    .domain([ Math.round( d3.max( vals ) * 1.1), Math.round( d3.min( vals ) *.75 ) ])
-    .range([0, settings.height - settings.top - settings.bottom ]);
+    .domain([ d3.max( vals ), d3.min( vals ) *.75 ])
+    .range([0, settings.height - settings.top - settings.bottom ])
+    .nice();
 
   var axisY = d3.axisLeft().scale( scaleY );
 

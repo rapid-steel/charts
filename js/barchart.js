@@ -45,11 +45,12 @@ function drawBarChart( data ) {
 
   var scaleY = d3.scaleLinear()
     .domain([ 0, d3.max( data.map( function(d) { return d.val })) ])
-    .range([ settings.height - settings.top - settings.bottom , 0]);
+    .range([ settings.height - settings.top - settings.bottom , 0])
+    .nice();
 
   var axisY = d3.axisLeft().scale( scaleY );
 
-  groupY.call( axisY.ticks(5));
+  groupY.call( axisY );
 
   groupY.selectAll('.tick line')
     .attr('x2', settings.width - settings.left - settings.right );

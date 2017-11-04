@@ -2,6 +2,26 @@
 
 
 $data = [
+    'halfDonut' => [
+        'center' => [ 'label' => 'daily average', 'val' => 587 ],
+        'sections' => [
+            [ 'label' => 'one', 'val' => 587 ],
+            [ 'label' => 'two', 'val' => 305 ]
+        ]
+    ],
+
+    'donut' => [
+        'center' => [ 'label' => 'total', 'val' => 5110 ],
+        'sections' => [
+            [ 'label' => 'one', 'val' => 15 ],
+            [ 'label' => 'two', 'val' => 32 ],
+            [ 'label' => 'three', 'val' => 3 ],
+            [ 'label' => 'four', 'val' => 30 ],
+            [ 'label' => 'five', 'val' => 10 ],
+            [ 'label' => 'six', 'val' => 20 ]
+        ]
+    ],
+
     'barchart' => [
         [ 'label' => 'one', 'val' => 20 ],
         [ 'label' => 'two', 'val' => 25 ],

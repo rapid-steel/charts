@@ -1,32 +1,7 @@
 
-function drawBarChart( data ) {
+function drawBarChart( data, settings ) {
 
-  var settings = {
-    width: 500,
-    height: 550,
-    bottom: 50,
-    left: 50,
-    right: 50,
-    top: 100,
-    title: 'Bar chart'
-  };
-
-
-  var barchart = d3.select('#bar-chart')
-    .append('svg')
-    .attr('width', settings.width )
-    .attr('height', settings.height );
-
-  barchart.append('rect')
-    .attr('width', settings.width )
-    .attr('height', settings.height )
-    .classed('background', true);
-
-  barchart.append('text')
-    .classed('title', true)
-    .attr('x', settings.width / 2 )
-    .attr('y', 30)
-    .text( settings.title );
+  var barchart = initChart( settings );
 
   var groupY = barchart.append('g')
     .classed('axis', true)
@@ -39,7 +14,7 @@ function drawBarChart( data ) {
   var scaleX = d3.scaleBand()
     .domain( data.map( function( d) { return d.label } ))
     .range([ 0, settings.width - settings.left - settings.right ])
-    .padding( 0.3 );
+    .padding( settings.barPadding );
 
   var axisX = d3.axisBottom().scale( scaleX );
 
@@ -59,7 +34,6 @@ function drawBarChart( data ) {
 
   groupX.selectAll('.tick text')
     .attr('text-anchor', 'middle');
-
 
   groupX.selectAll('rect')
     .data( data )
@@ -93,13 +67,13 @@ function drawBarChart( data ) {
     .classed('hint', true)
     .style('opacity', 0)
     .style('left', function( d ) {
-      return settings.left + scaleX( d.label ) - scaleX.step() * .15 + 'px'
+      return settings.left + scaleX( d.label ) - scaleX.step() * settings.barPadding / 2 + 'px'
     })
     .style('width', scaleX.step() + 'px' )
     .style('top', function ( d ) {
       return  settings.top + scaleY( d.val ) - 55  + 'px'
     })
-    .html( function( d ) { return d.val })
+    .html( function( d ) { return d.val + settings.unit })
     .append('div')
     .classed('corner', true)
     .style('left', scaleX.step() / 2 - 10 + 'px');

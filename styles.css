@@ -1,46 +1,77 @@
-* {
-    font-family: Verdana;
-}
+/* for all */
+
+* {  font-family: Verdana }
 
 .chart {
     position: relative;
     display: inline-block;
 }
 
-#bar-chart {
-    width: 500px;
-    height: 550px;
-
-}
-
-.date {
-    opacity: 0;
-    transition: all .25s;
-}
-
-
-.date rect {
-    fill: rgba(255, 255, 255, 0.2);
-}
-
-.date text {
-
-}
-
+.background { fill: #383E44 }
 
 .title {
-    font-size: 20px;
+    font-size: 24px;
     text-anchor: middle;
     fill: #B7B9BC;
 }
 
-.axis path {
+.tick,
+.thread,
+.thread-radial {
+    text-anchor: end;
+    font-size: 18px;
+    fill: none;
     stroke: #494E54;
 }
 
-.bar {
-    fill: #00DEDD
+.tick line {
+    stroke: #494E54;
+    stroke-width: 2
 }
+
+.tick text {
+    font-size: 12px;
+    fill: #B7B9BC;
+    stroke: none;
+}
+
+.value { font-weight: bold }
+
+.label { fill: #B7B9BC }
+
+.axis path { stroke: #494E54 }
+
+/* for donut and halfdonut */
+
+.center-val,
+.center-label{ text-anchor: middle }
+
+.center-val {
+    fill: white;
+    font-weight: bold;
+    font-size: 30px;
+    dominant-baseline: text-top;
+}
+#half-donut-chart .center-val { font-size: 48px }
+
+.center-label {
+    fill: #B7B9BC;
+    font-size: 20px;
+    dominant-baseline: hanging;
+}
+
+.section { transition: all .5s }
+#donut-chart .section:hover,
+#donut-chart .section.hover{ transform: scale(1.1) }
+
+.label-donut { opacity: 0 }
+.section:hover .label-donut,
+.section.hover .label-donut{
+    opacity: 1;
+    transition: all .5s;
+}
+
+/* for plot and barchart */
 
 .hint,
 .hint-plot {
@@ -71,60 +102,68 @@
     transform: rotate(45deg);
     top: 25px;
 }
-
-.hint-plot .corner {
-    top: 45px;
-}
-
-.value {
-    font-weight: bold;
-}
+.hint-plot .corner { top: 45px }
 
 .point-date {
     font-size: 10px;
     color: #707379;
 }
 
-.tick line {
-    stroke: #494E54;
-    stroke-width: 2
+/* for donut */
+
+#donut-legend {
+    position: absolute;
+    width: 120px;
+    bottom: 20px;
+    right: 10px;
+    text-align: center;
 }
 
-.tick text {
-    font-size: 12px;
+#donut-legend hr {
+    width: 80%;
+    color: #B7B9BC;
+}
+
+#donut-legend > div {
+    width: 100%;
+    height: auto;
+}
+
+#donut-legend > div:last-child hr { display: none }
+
+.marker {
+    float: left;
+    margin: 10px;
+    border-style: solid;
+    border-width: 5px;
+    border-radius: 50%;
+}
+
+.legend-val {
+    width: 100%;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.legend-label {
+    margin-left: 30px;
+    color: #B7B9BC;
+    text-align: center;
+}
+
+/* for barchart */
+
+.bar { fill: #00DEDD }
+
+/* for radar */
+
+.scale {
+    text-anchor: end;
+    font-size: 16px;
     fill: #B7B9BC;
     stroke: none;
-}
-
-#radar-chart {
-    width: 650px;
-    height: 500px;
-    position: relative;
-}
-
-svg {
-    width: 100%;
-    height: 100%;
-}
-
-.background {
-    fill: #383E44;
-}
-
-.thread {
-    fill: transparent;
-    stroke: #494E54;
-}
-
-.thread-radial {
-    stroke: #494E54;
-}
-
-.tick {
-    text-anchor: end;
-    font-size: 18px;
-    fill: white;
-    stroke: white;
 }
 
 .graph path {
@@ -135,8 +174,6 @@ svg {
 .graph:hover path {
     fill-opacity: .35;
 }
-
-.label { fill: #B7B9BC }
 
 #legend {
     position: absolute;
@@ -162,3 +199,14 @@ svg {
     width: 100px;
     color: white;
 }
+
+/* for plot */
+
+.date-rect {
+    opacity: 0;
+    fill: rgba(255, 255, 255, 0.2);
+    transition: all .25s;
+}
+
+
+

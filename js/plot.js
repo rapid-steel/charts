@@ -1,42 +1,18 @@
-function drawPlot( data ) {
+function drawPlot( data, settings ) {
 
-  var settings = {
-    width: 800,
-    height: 500,
-    top: 100,
-    left: 50,
-    right: 50,
-    bottom: 50,
-    title: 'Plot',
-    colors: [ 'red', 'blue', 'green', 'white' ]
-  };
 
-  var plot = d3.select('#plot')
-    .append('svg')
-    .attr('width', settings.width )
-    .attr('height', settings.height );
+  var plot = initChart( settings );
 
-  plot.append('rect')
-    .attr('width', settings.width )
-    .attr('height', settings.height )
-    .classed('background', true);
-
-  plot.append('text')
-    .classed('title', true)
-    .attr('x', settings.width / 2 )
-    .attr('y', 30)
-    .text( settings.title );
-
-data.dates.forEach( function( d, i )  {
-  data.dates[ i ] = new Date( d )
-});
+  data.dates.forEach( function( d, i )  {
+    data.dates[ i ] = new Date( d )
+  });
 
   var vals = data.lines.reduce(function( arr, d ) { return arr.concat( d ) }, []);
 
   var scaleX =  d3.scaleBand()
     .domain( data.dates.map( function(d) { return d.toDateString().slice( 4 ) }) )
     .range([ 0, settings.width - settings.left - settings.right ])
-    .padding( 0.3 );
+    .padding( 0 );
 
   var axisX = d3.axisBottom().scale( scaleX );
 
@@ -77,17 +53,17 @@ data.dates.forEach( function( d, i )  {
 
   var rectHover;
 
-  groupY.selectAll('.date')
+  groupY.selectAll('.date-rect')
     .data( data.dates )
     .enter()
     .append('g')
     .attr('id', function( d, i ) { return 'rect' + i })
     .attr('transform', function( d, i ) {
-      return 'translate(' + scaleX.step() * i + ',0)';
+      return 'translate(' +  scaleX.step() * i + ',0)';
     })
-    .classed('date', true);
+    .classed('date-rect', true);
 
-  groupY.selectAll('.date')
+  groupY.selectAll('.date-rect')
     .append('rect')
     .attr('width', scaleX.step() )
     .attr('height', settings.height - settings.top - settings.bottom );
@@ -118,7 +94,7 @@ data.dates.forEach( function( d, i )  {
     .append('circle')
     .attr('cx', function ( d ) { return d[0]})
     .attr('cy', function ( d ) { return d[1]})
-    .attr('r', 4 );
+    .attr('r', settings.pointRadius );
 
   groupY.selectAll('.plot-line').selectAll('.circle-area')
     .data( function( d ) { return d } )
@@ -127,7 +103,7 @@ data.dates.forEach( function( d, i )  {
     .attr('id', function( d, i) { return 'circle' + i })
     .attr('cx', function ( d ) { return d[0]})
     .attr('cy', function ( d ) { return d[1]})
-    .attr('r', 8 )
+    .attr('r', settings.pointRadius * 2 )
     .style('fill', 'transparent')
     .on('mouseenter', function() {
       var hintId = '#hint' + d3.event.target.parentNode.id.slice( 4 ) + '-' + d3.event.target.id.slice( 6 );
@@ -142,7 +118,7 @@ data.dates.forEach( function( d, i )  {
         .transition( 750 )
         .style('opacity', 0)
         .style('display','none');
-    })
+    });
 
 
   groupY.on('mousemove', function() {
@@ -169,7 +145,7 @@ data.dates.forEach( function( d, i )  {
       .classed('hint-plot', true)
       .attr('id', function(d, i1) { return 'hint' + i +'-' + i1; })
       .style('left', function( d, i1 ) {
-        return settings.left + scaleX( data.dates[ i1 ].toDateString().slice( 4 ) ) - scaleX.step() * .3 + 'px'
+        return settings.left + scaleX( data.dates[ i1 ].toDateString().slice( 4 ) ) + 'px'
       })
       .style('width', scaleX.step() + 'px' )
       .style('top', function ( d ) {
@@ -179,7 +155,7 @@ data.dates.forEach( function( d, i )  {
 
     hints.append('div')
       .classed('value', true)
-      .html( function(d) { return d });
+      .html( function(d) { return d + settings.unit });
 
     hints.append('div')
       .classed('point-date', true)
@@ -187,12 +163,8 @@ data.dates.forEach( function( d, i )  {
 
     hints.append('div')
       .classed('corner', true)
-      .style('left', scaleX.step() / 2 - 10 + 'px');;
-
+      .style('left', scaleX.step() / 2 - 10 + 'px');
   });
-
-
-
 
 };
 

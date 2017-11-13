@@ -6,18 +6,25 @@
   xhr.onload = function () {
     data = JSON.parse( xhr.responseText );
 
-
-    drawHalfDonut( data.halfDonut, settings.halfDonut );
-    drawDonut( data.donut, settings.donut );
-    drawBarChart( data.barchart, settings.barchart );
-    drawRadar( data.radar, settings.radar );
-    drawPlot( data.plot, settings.plot );
+    initAll( data );
+    window.addEventListener('resize', function() {
+      document.querySelectorAll('svg').forEach( function( node ) { node.parentNode.innerHTML = ''; });
+      initAll( data );
+    });
   };
 
 
   xhr.open('GET', 'getdata.php');
 
   xhr.send();
+
+  function initAll( all ) {
+    drawHalfDonut( data.halfDonut, getSettings( 'halfDonut', '#half-donut-chart') );
+    drawDonut( data.donut, getSettings( 'donut', '#donut-chart') );
+    drawBarChart( data.barchart, getSettings( 'barchart', '#bar-chart') );
+    drawRadar( data.radar, getSettings( 'radar', '#radar-chart') );
+    drawPlot( data.plot, getSettings( 'plot', '#plot') );
+  }
 
 
 

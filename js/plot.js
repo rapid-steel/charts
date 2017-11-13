@@ -1,7 +1,11 @@
 function drawPlot( data, settings ) {
 
+  if ( data.dates.length > 30 ) {
+    settings.width += ( settings.width - settings.left - settings.right ) / data.dates.length * ( data.dates.length - 30 )
+  }
 
   var plot = initChart( settings );
+
 
   data.dates.forEach( function( d, i )  {
     data.dates[ i ] = new Date( d )
@@ -14,13 +18,21 @@ function drawPlot( data, settings ) {
     .range([ 0, settings.width - settings.left - settings.right ])
     .padding( 0 );
 
+  var ticks = scaleX.step() > 90 ?  1 : Math.ceil( 90 / scaleX.step() );
+
+  console.log( ticks );
+
   var axisX = d3.axisBottom().scale( scaleX );
 
   var groupX = plot.append('g')
     .classed('axis', true )
     .attr('transform', 'translate(' + settings.left + ',' + ( settings.height - settings.bottom ) + ')');
 
-  groupX.call( axisX );
+  groupX.call( axisX.tickValues(
+    data.dates.filter( function( d, i ) {
+      return i % ticks === 0;
+    }).map( function( d) { return d.toDateString().slice( 4 ) })) );
+
 
   groupX.selectAll('.tick text')
     .style('text-anchor', 'middle');
@@ -34,11 +46,13 @@ function drawPlot( data, settings ) {
   var axisY = d3.axisLeft().scale( scaleY );
 
 
+
+
   var groupY = plot.append('g')
     .classed('axis', true )
     .attr('transform', 'translate(' + settings.left + ',' + settings.top + ')');
 
-  groupY.call( axisY.ticks( 8 ) );
+  groupY.call( axisY );
 
   groupY.selectAll('.tick line')
     .attr('x2', settings.width - settings.left - settings.right );
@@ -137,7 +151,7 @@ function drawPlot( data, settings ) {
     });
 
   data.lines.forEach( function( line, i ) {
-    var hints = d3.select('#plot')
+    var hints = d3.select( settings.container )
       .selectAll('div.line' + i )
       .data( line )
       .enter()
@@ -145,9 +159,9 @@ function drawPlot( data, settings ) {
       .classed('hint-plot', true)
       .attr('id', function(d, i1) { return 'hint' + i +'-' + i1; })
       .style('left', function( d, i1 ) {
-        return settings.left + scaleX( data.dates[ i1 ].toDateString().slice( 4 ) ) + 'px'
+        return settings.left + scaleX( data.dates[ i1 ].toDateString().slice( 4 ) ) + scaleX.step() / 2 - 40 + 'px'
       })
-      .style('width', scaleX.step() + 'px' )
+      .style('width', '80px' )
       .style('top', function ( d ) {
         return  settings.top + scaleY( d ) - 75  + 'px'
       })
@@ -159,11 +173,11 @@ function drawPlot( data, settings ) {
 
     hints.append('div')
       .classed('point-date', true)
-      .html( function(d, i1) { return data.dates[ i1 ].toDateString() });
+      .html( function(d, i1) { return data.dates[ i1 ].toDateString().slice( 4 ) });
 
     hints.append('div')
       .classed('corner', true)
-      .style('left', scaleX.step() / 2 - 10 + 'px');
+      .style('left', '30px');
   });
 
 };

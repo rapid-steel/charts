@@ -7,6 +7,31 @@
     display: inline-block;
 }
 
+#donut-chart {
+    width: 50%;
+    height: 500px;
+}
+#half-donut-chart {
+    width: 45%;
+    height: 500px;
+}
+
+#radar-chart {
+    width: 70%;
+    height: 500px;
+}
+
+#bar-chart {
+    width: 60%;
+    height: 500px;
+}
+
+
+#plot {
+    width: 90%;
+    height: 500px;
+}
+
 .background { fill: #383E44 }
 
 .title {

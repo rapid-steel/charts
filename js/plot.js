@@ -11,7 +11,7 @@ function drawPlot( data, settings ) {
     data.dates[ i ] = new Date( d )
   });
 
-  var vals = data.lines.reduce(function( arr, d ) { return arr.concat( d ) }, []);
+  var vals = data.lines.slice( 0, data.dates.length ).reduce(function( arr, d ) { return arr.concat( d ) }, []);
 
   var scaleX =  d3.scaleBand()
     .domain( data.dates.map( function(d) { return d.toDateString().slice( 4 ) }) )
@@ -47,7 +47,6 @@ function drawPlot( data, settings ) {
 
 
 
-
   var groupY = plot.append('g')
     .classed('axis', true )
     .attr('transform', 'translate(' + settings.left + ',' + settings.top + ')');
@@ -58,10 +57,11 @@ function drawPlot( data, settings ) {
     .attr('x2', settings.width - settings.left - settings.right );
 
   var points = data.lines.map( function( line ) {
-    return line.map( function( point, i ) {
+    return line.slice( 0, data.dates.length ).map( function( point, i ) {
       return [ scaleX.step() * ( i + .5 ), scaleY( point ) ]
     });
   });
+
 
   var line = d3.line();
 
@@ -150,10 +150,10 @@ function drawPlot( data, settings ) {
       rectHover = false;
     });
 
-  data.lines.forEach( function( line, i ) {
+  data.lines.slice( 0, data.dates.length ).forEach( function( line, i ) {
     var hints = d3.select( settings.container )
       .selectAll('div.line' + i )
-      .data( line )
+      .data( line.slice( 0, data.dates.length) )
       .enter()
       .append('div')
       .classed('hint-plot', true)

@@ -74,14 +74,11 @@
 .center-val {
     fill: white;
     font-weight: bold;
-    font-size: 30px;
     dominant-baseline: text-top;
 }
-#half-donut-chart .center-val { font-size: 48px }
 
 .center-label {
     fill: #B7B9BC;
-    font-size: 20px;
     dominant-baseline: hanging;
 }
 

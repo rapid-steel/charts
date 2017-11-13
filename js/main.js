@@ -56,10 +56,12 @@
       .attr('transform', 'translate(' + settings.center.x  + ',' + settings.center.y + ')');
 
     pieGroup.append('text')
+      .style('font-size', settings.fontSize.centerVal )
       .classed('center-val', true)
       .text( data.center.val );
 
     pieGroup.append('text')
+      .style('font-size', settings.fontSize.centerLabel )
       .classed('center-label', true)
       .text( data.center.label );
 

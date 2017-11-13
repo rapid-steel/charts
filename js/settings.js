@@ -3,6 +3,7 @@ function getSettings( type, container ) {
   const containerEl = document.querySelector( container );
   const width = containerEl.clientWidth;
   const height = containerEl.clientHeight;
+  const min = width < height ? width : height
 
   switch ( type ) {
     case 'halfDonut':
@@ -16,10 +17,14 @@ function getSettings( type, container ) {
           x: width / 2,
           y: height - 100
         },
-        innerRadius: width > height ? height * 0.3 : width * 0.3,
-        outerRadius:  width > height ? height * 0.3 + 50 : width * 0.3 + 50,
-        scaleRadius:  width > height ? height * 0.3 + 80 : width * 0.3 - 40,
-        colors: [ '#EE5843', '#5F6469' ]
+        innerRadius: min * 0.3,
+        outerRadius: min * 0.3 + 50,
+        scaleRadius: min * 0.3 - 40,
+        colors: [ '#EE5843', '#5F6469' ],
+        fontSize: {
+          centerLabel : min > 420 ? '20px' : min / 21 + 'px',
+          centerVal: min > 480 ? '48px' : min / 10 + 'px'
+        }
       };
 
     case 'donut':
@@ -31,13 +36,17 @@ function getSettings( type, container ) {
           x: width / 2 - 60,
           y: height / 2 + 40
         },
-        innerRadius: width < height ? width * .15 : height * .15,
-        outerRadius: width < height ? width * .28 : height * .28,
-        labelRadius: width < height ? width * .45 : height * .45,
+        innerRadius: min * .15,
+        outerRadius: min * .28,
+        labelRadius: min * .45,
         title: 'Donut',
         titleTop: 50,
         unit: '',  //will be displayed next to the value. '%', for example
-        colors: [ '#DAEAF6', '#291F71', '#B30753', '#FFA8B8', '#C82586', '#5AC8D8' ]
+        colors: [ '#DAEAF6', '#291F71', '#B30753', '#FFA8B8', '#C82586', '#5AC8D8' ],
+        fontSize: {
+          centerLabel : min < 420 ? '20px' : min / 21 + 'px',
+          centerVal: min > 420 ? '30px' : min / 14 + 'px'
+        }
       };
 
     case 'radar':

@@ -1,16 +1,11 @@
-var start = 0;
-
-function drawPlot( dataAll, settings ) {
-
-  var length = dataAll.dates.length;
 
 
-  dataAll.dates.forEach( function( d, i )  {
-    dataAll.dates[ i ] = new Date( d )
+function drawPlot( data, settings ) {
+
+
+  data.dates.forEach( function( d, i )  {
+    data.dates[ i ] = new Date( d )
   });
-
-  var data = { dates: dataAll.dates.slice( start, start + 30 ) };
-  data.lines =  dataAll.lines.map( function ( line ) { return line.slice( start, start + data.dates.length ) });
 
   var plot = initChart( settings );
   var vals = data.lines.slice( 0, data.dates.length ).reduce(function( arr, d ) { return arr.concat( d ) }, []);
@@ -37,19 +32,6 @@ function drawPlot( dataAll, settings ) {
     data.dates.filter( function( d, i ) {
       return i % ticks === 0;
     }).map( function( d) { return d.toDateString().slice( 4 ) })) );
-
-  groupX.on('wheel', function () {
-    d3.event.preventDefault();
-    var inc = Math.sign( d3.event.deltaY );
-    if ( Math.abs( inc ) === 1 ) {
-      if ( ( start > 0 && inc === -1 ) || ( start + 30 < length && inc === 1 ) ) {
-        start += inc;
-        update();
-      }
-    }
-  });
-
-
 
 
   var scaleY = d3.scaleLinear()
@@ -196,77 +178,6 @@ function drawPlot( dataAll, settings ) {
       .style('left', '30px');
   });
 
-  function update() {
-    data.dates = dataAll.dates.slice( start, start + 30 );
-    data.lines =  dataAll.lines.map( function ( line ) { return line.slice( start, start + data.dates.length ) });
-    vals = data.lines.slice( 0, data.dates.length ).reduce(function( arr, d ) { return arr.concat( d ) }, []);
-    points = data.lines.map( function( line ) {
-      return line.map( function( point, i ) {
-        return [ scaleX.step() * ( i + .5 ), scaleY( point ) ]
-      });
-    });
-
-    scaleX.domain( data.dates.map( function(d) { return d.toDateString().slice( 4 ) }) );
-
-    groupX.call( axisX.tickValues(
-      data.dates.filter( function( d, i ) {
-        return i % ticks === 0;
-      }).map( function( d) { return d.toDateString().slice( 4 ) })) );
-
-
-    groupY.selectAll('.plot-path')
-      .data( points )
-      .select('path')
-      .attr('d', function( d ) { return line( d ) });
-
-
-
-   d3.selectAll('.plot-line circle').style('display', 'none');
-
-
-    groupY.selectAll('.plot-line')
-      .data( points )
-      .selectAll('.point')
-      .data( function( d ) { return d } )
-      .attr('cx', function ( d ) { return d[0]})
-      .attr('cy', function ( d ) { return d[1]})
-      .style('display', 'block');
-
-    groupY.selectAll('.plot-line')
-      .data( points )
-      .selectAll('.circle-area')
-      .data( function( d ) { return d } )
-      .attr('cx', function ( d ) { return d[0]})
-      .attr('cy', function ( d ) { return d[1]})
-      .style('display', 'block');
-
-
-
-    data.lines.forEach( function( line, i ) {
-
-
-      var hints = d3.select( settings.container )
-        .selectAll('div.line' + i )
-        .data( line )
-        .style('left', function( d, i1 ) {
-          return settings.left + scaleX( data.dates[ i1 ].toDateString().slice( 4 ) ) + scaleX.step() / 2 - 40 + 'px'
-        })
-        .style('top', function ( d ) {
-          return  settings.top + scaleY( d ) - 75  + 'px'
-        })
-
-      hints.select('.value')
-        .html( function(d) { return d + settings.unit });
-
-      hints.select('.point-date')
-        .html( function(d, i1) { return data.dates[ i1 ].toDateString().slice( 4 ) });
-
-    });
-
-
-
-
-  }
 
 }
 

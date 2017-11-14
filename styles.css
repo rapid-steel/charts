@@ -28,7 +28,7 @@
 
 
 #plot {
-    width: 90%;
+    width: 95%;
     height: 500px;
 }
 
@@ -228,6 +228,10 @@
     opacity: 0;
     fill: rgba(255, 255, 255, 0.2);
     transition: all .25s;
+}
+
+#plot .tick text {
+    text-anchor: middle
 }
 
 

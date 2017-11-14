@@ -1,16 +1,18 @@
-function drawPlot( data, settings ) {
+var start = 0;
 
-  if ( data.dates.length > 30 ) {
-    settings.width += ( settings.width - settings.left - settings.right ) / data.dates.length * ( data.dates.length - 30 )
-  }
+function drawPlot( dataAll, settings ) {
 
-  var plot = initChart( settings );
+  var length = dataAll.dates.length;
 
 
-  data.dates.forEach( function( d, i )  {
-    data.dates[ i ] = new Date( d )
+  dataAll.dates.forEach( function( d, i )  {
+    dataAll.dates[ i ] = new Date( d )
   });
 
+  var data = { dates: dataAll.dates.slice( start, start + 30 ) };
+  data.lines =  dataAll.lines.map( function ( line ) { return line.slice( start, start + data.dates.length ) });
+
+  var plot = initChart( settings );
   var vals = data.lines.slice( 0, data.dates.length ).reduce(function( arr, d ) { return arr.concat( d ) }, []);
 
   var scaleX =  d3.scaleBand()
@@ -18,9 +20,7 @@ function drawPlot( data, settings ) {
     .range([ 0, settings.width - settings.left - settings.right ])
     .padding( 0 );
 
-  var ticks = scaleX.step() > 90 ?  1 : Math.ceil( 90 / scaleX.step() );
-
-  console.log( ticks );
+  var ticks = scaleX.step() > 80 ?  1 : Math.ceil( 80 / scaleX.step() );
 
   var axisX = d3.axisBottom().scale( scaleX );
 
@@ -28,14 +28,28 @@ function drawPlot( data, settings ) {
     .classed('axis', true )
     .attr('transform', 'translate(' + settings.left + ',' + ( settings.height - settings.bottom ) + ')');
 
+  groupX.append('rect')
+    .classed('background', true)
+    .attr('width', settings.width - settings.left - settings.right)
+    .attr('height', settings.height - settings.top - settings.bottom);
+
   groupX.call( axisX.tickValues(
     data.dates.filter( function( d, i ) {
       return i % ticks === 0;
     }).map( function( d) { return d.toDateString().slice( 4 ) })) );
 
+  groupX.on('wheel', function () {
+    d3.event.preventDefault();
+    var inc = Math.sign( d3.event.deltaY );
+    if ( Math.abs( inc ) === 1 ) {
+      if ( ( start > 0 && inc === -1 ) || ( start + 30 < length && inc === 1 ) ) {
+        start += inc;
+        update();
+      }
+    }
+  });
 
-  groupX.selectAll('.tick text')
-    .style('text-anchor', 'middle');
+
 
 
   var scaleY = d3.scaleLinear()
@@ -44,7 +58,6 @@ function drawPlot( data, settings ) {
     .nice();
 
   var axisY = d3.axisLeft().scale( scaleY );
-
 
 
   var groupY = plot.append('g')
@@ -102,10 +115,12 @@ function drawPlot( data, settings ) {
     .style('fill', function( d, i ){ return settings.colors[i] })
     .classed('plot-line', true );
 
-  groupY.selectAll('.plot-line').selectAll('circle')
+  groupY.selectAll('.plot-line')
+    .selectAll('circle')
     .data( function( d ) { return d } )
     .enter()
     .append('circle')
+    .classed('point', true)
     .attr('cx', function ( d ) { return d[0]})
     .attr('cy', function ( d ) { return d[1]})
     .attr('r', settings.pointRadius );
@@ -114,6 +129,7 @@ function drawPlot( data, settings ) {
     .data( function( d ) { return d } )
     .enter()
     .append('circle')
+    .classed('circle-area', true)
     .attr('id', function( d, i) { return 'circle' + i })
     .attr('cx', function ( d ) { return d[0]})
     .attr('cy', function ( d ) { return d[1]})
@@ -150,7 +166,7 @@ function drawPlot( data, settings ) {
       rectHover = false;
     });
 
-  data.lines.slice( 0, data.dates.length ).forEach( function( line, i ) {
+  data.lines.forEach( function( line, i ) {
     var hints = d3.select( settings.container )
       .selectAll('div.line' + i )
       .data( line.slice( 0, data.dates.length) )
@@ -180,5 +196,80 @@ function drawPlot( data, settings ) {
       .style('left', '30px');
   });
 
-};
+  function update() {
+    data.dates = dataAll.dates.slice( start, start + 30 );
+    data.lines =  dataAll.lines.map( function ( line ) { return line.slice( start, start + data.dates.length ) });
+    vals = data.lines.slice( 0, data.dates.length ).reduce(function( arr, d ) { return arr.concat( d ) }, []);
+    points = data.lines.map( function( line ) {
+      return line.map( function( point, i ) {
+        return [ scaleX.step() * ( i + .5 ), scaleY( point ) ]
+      });
+    });
+
+    scaleX.domain( data.dates.map( function(d) { return d.toDateString().slice( 4 ) }) );
+
+    groupX.call( axisX.tickValues(
+      data.dates.filter( function( d, i ) {
+        return i % ticks === 0;
+      }).map( function( d) { return d.toDateString().slice( 4 ) })) );
+
+
+    groupY.selectAll('.plot-path')
+      .data( points )
+      .select('path')
+      .attr('d', function( d ) { return line( d ) });
+
+
+
+   d3.selectAll('.plot-line circle').style('display', 'none');
+
+
+    groupY.selectAll('.plot-line')
+      .data( points )
+      .selectAll('.point')
+      .data( function( d ) { return d } )
+      .attr('cx', function ( d ) { return d[0]})
+      .attr('cy', function ( d ) { return d[1]})
+      .style('display', 'block');
+
+    groupY.selectAll('.plot-line')
+      .data( points )
+      .selectAll('.circle-area')
+      .data( function( d ) { return d } )
+      .attr('cx', function ( d ) { return d[0]})
+      .attr('cy', function ( d ) { return d[1]})
+      .style('display', 'block');
+
+
+
+    data.lines.forEach( function( line, i ) {
+
+
+      var hints = d3.select( settings.container )
+        .selectAll('div.line' + i )
+        .data( line )
+        .style('left', function( d, i1 ) {
+          return settings.left + scaleX( data.dates[ i1 ].toDateString().slice( 4 ) ) + scaleX.step() / 2 - 40 + 'px'
+        })
+        .style('top', function ( d ) {
+          return  settings.top + scaleY( d ) - 75  + 'px'
+        })
+
+      hints.select('.value')
+        .html( function(d) { return d + settings.unit });
+
+      hints.select('.point-date')
+        .html( function(d, i1) { return data.dates[ i1 ].toDateString().slice( 4 ) });
+
+    });
+
+
+
+
+  }
+
+}
+
+
+
 
